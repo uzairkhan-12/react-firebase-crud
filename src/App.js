@@ -1,23 +1,36 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
+import db from './firebase'
+import { addDoc, collection, CollectionReference, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import {handleNew} from './util'
+import {handleEdit} from './util'
+import { handleDelete } from './util';
+import Dot from './Dot'
 
 function App() {
+  const [colors , setColors] = useState([])
+  console.log(colors)
+  useEffect(
+    () => 
+      onSnapshot(collection(db, "cololrs"), (snapshot) => 
+        setColors(snapshot.docs.map(doc => ({...doc.data(), id:doc.id})))
+        ),
+        []
+    );
+   
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={handleNew} className='button'>New</button>
+      <ul>
+       {colors.map(x => {
+         return <li key={x.id}>
+          <button className='button2' onClick={()=> handleEdit(x.id)} href="#">edit</button> <Dot color={x.value} />  {x.name}
+          <button className='button3' onClick={()=> handleDelete(x.id)}>Delete</button>
+        </li>
+        })}
+       
+      </ul>
     </div>
   );
 }
